@@ -17,20 +17,23 @@ class ApksizeSpider(scrapy.Spider):
                 for line in f.readlines():
                     self.start_urls.append(self.url_prefix + line.strip())
         else:
-            self.start_urls = [self.url_prefix + app_name]
+            self.start_urls = [f"{self.url_prefix}{app_name}"]
         print(f"Start Url:{self.start_urls}")
 
     def parse(self, response):
-        for quote in response.xpath('//div[@class="infoSlide"]'):
-            datetime = quote.css(
-                'p span span[class=datetime_utc]::text'
-            ).extract()
-            infos = quote.css(
+        for quote_title, quote_info in zip(
+                response.css("div[id=primary] h5 a[class=fontBlack]::text"),
+                response.xpath('//div[@class="infoSlide"]')):
+            fullname = quote_title.extract()
+            datetime = quote_info.css(
+                'p span span[class=datetime_utc]::text').extract()
+            infos = quote_info.css(
                 'p span[class=infoslide-value]::text'
             ).extract()
 
             yield {
                 'app': response.request.url.split("=")[1],
+                'app_fullname': fullname,
                 'version': infos[0],
                 'filesize': infos[1],
                 'datetime': datetime,
