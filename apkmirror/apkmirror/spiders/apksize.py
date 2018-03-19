@@ -15,8 +15,14 @@ class ApksizeSpider(scrapy.Spider):
     path_prefix = "uploads/?q="
     size_pattern = re.compile(".*MB")
 
-    def __init__(self, apps_list_file=None, app_name=None, *args, **kwargs):
+    def __init__(self,
+                 apps_list_file=None,
+                 app_name=None,
+                 fetch_variant="True",
+                 *args,
+                 **kwargs):
         super(ApksizeSpider, self).__init__(*args, **kwargs)
+        self.fetch_variant = (fetch_variant in ["True", "true", "TRUE"])
         self.url_prefix = urljoin(self.url_host, self.path_prefix)
         if apps_list_file:
             self.start_urls = []
@@ -45,11 +51,14 @@ class ApksizeSpider(scrapy.Spider):
                 datetime=datetime,
             )
             detail_link = quote_title.xpath("@href").extract_first()
-            yield scrapy.Request(
-                urljoin(self.url_host, detail_link),
-                self.parse_variant,
-                meta={'item': item},
-            )
+            if self.fetch_variant:
+                yield scrapy.Request(
+                    urljoin(self.url_host, detail_link),
+                    self.parse_variant,
+                    meta={'item': item},
+                )
+            else:
+                yield item
         next_page = response.xpath(
             '//a[@class="nextpostslink"]/@href'
         ).extract_first()
