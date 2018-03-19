@@ -26,7 +26,7 @@ class ApksizeSpider(scrapy.Spider):
                 response.xpath('//div[@class="infoSlide"]')):
             fullname = quote_title.extract()
             datetime = quote_info.css(
-                'p span span[class=datetime_utc]::text').extract()
+                'p span span[class=datetime_utc]::text').extract_first()
             infos = quote_info.css(
                 'p span[class=infoslide-value]::text'
             ).extract()
