@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import scrapy
+from apkmirror.items import ApkmirrorItem
 
 
 class ApksizeSpider(scrapy.Spider):
@@ -31,13 +32,13 @@ class ApksizeSpider(scrapy.Spider):
                 'p span[class=infoslide-value]::text'
             ).extract()
 
-            yield {
-                'app': response.request.url.split("=")[1],
-                'app_fullname': fullname,
-                'version': infos[0],
-                'filesize': infos[1],
-                'datetime': datetime,
-            }
+            yield ApkmirrorItem(
+                app=response.request.url.split("=")[1],
+                app_fullname=fullname,
+                version=infos[0],
+                filesize=infos[1],
+                datetime=datetime,
+            )
         next_page = response.xpath(
             '//a[@class="nextpostslink"]/@href').extract_first()
         if next_page:

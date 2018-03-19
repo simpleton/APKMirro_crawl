@@ -11,5 +11,8 @@ import scrapy
 
 class ApkmirrorItem(scrapy.Item):
     # define the fields for your item here like:
-    # name = scrapy.Field()
-    pass
+    app = scrapy.Field()
+    app_fullname = scrapy.Field()
+    version = scrapy.Field()
+    filesize = scrapy.Field()
+    datetime = scrapy.Field()
